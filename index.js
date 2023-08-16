@@ -10,12 +10,15 @@ const User = require("./models/User");
 const Invoices = require("./models/Invoices")
 const Prod = require("./models/Prod")
 const cors = require('cors');
+var bodyParser = require('body-parser')
 const mongo = new MongoClient(process.env.MONGO_URI, {
   useNewUrlParser: true,
 
   useUnifiedTopology: true,
 });
 app.use(cors());
+var jsonParser = bodyParser.json()
+
 app.get("/mongo-video3", async (req, res) => {
   try {
     const id = req.query.id;
@@ -81,7 +84,7 @@ app.post("/getinvoices", async (req, res) => {
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
 });
-app.post("/invoice", async (req, res) => {
+app.post("/invoice",jsonParser, async (req, res) => {
   const {data} = req.body
         console.log(data)
         var d = new Date(Date.now());
@@ -92,7 +95,7 @@ app.post("/invoice", async (req, res) => {
         await u.save();
         res.status(205).json({success:true})
 });
-app.post("/getprod", async (req, res) => {
+app.post("/getprod",jsonParser, async (req, res) => {
   let products=[]
   let data = await Prod.find()
   for (const key in data ) {
@@ -102,7 +105,7 @@ app.post("/getprod", async (req, res) => {
   }
   res.status(200).json(products)
 });
-app.post("/addprod", async (req, res) => {
+app.post("/addprod",jsonParser, async (req, res) => {
   console.log(req.body)
   const {name,slug,image,productID,amount,availableQty}= req.body.data
   console.log(req.body.data)
