@@ -8,12 +8,13 @@ connecttomongo();
 const MongoClient = require("mongodb").MongoClient;
 const User = require("./models/User");
 const Invoices = require("./models/Invoices")
+const cors = require('cors');
 const mongo = new MongoClient(process.env.MONGO_URI, {
   useNewUrlParser: true,
 
   useUnifiedTopology: true,
 });
-
+app.use(cors());
 app.get("/mongo-video3", async (req, res) => {
   try {
     const id = req.query.id;
