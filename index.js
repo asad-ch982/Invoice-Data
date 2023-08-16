@@ -8,6 +8,7 @@ connecttomongo();
 const MongoClient = require("mongodb").MongoClient;
 const User = require("./models/User");
 const Invoices = require("./models/Invoices")
+const Prod = require("./models/Prod")
 const cors = require('cors');
 const mongo = new MongoClient(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -90,6 +91,27 @@ app.post("/invoice", async (req, res) => {
         let u =  Invoices({data:data,date:date,InvoiceId:data.id});
         await u.save();
         res.status(205).json({success:true})
+});
+app.post("/getprod", async (req, res) => {
+  let products=[]
+  let data = await Prod.find()
+  for (const key in data ) {
+      if (data.hasOwnProperty(key) && data[key].data) {
+          products.push(...data[key].data); 
+      } 
+  }
+  res.status(200).json(products)
+});
+app.post("/addprod", async (req, res) => {
+  console.log(req.body)
+  const {name,slug,image,productID,amount,availableQty}= req.body.data
+  console.log(req.body.data)
+  let p = new Prod({
+     data:req.body.data,slug:slug
+  })
+  await p.save();
+
+  res.status(200).json({success:true})
 });
 
 app.listen(port, () => {
