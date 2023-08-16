@@ -66,7 +66,7 @@ app.get("/mongo-video3", async (req, res) => {
     console.error(error.message);
   }
 });
-app.post("/getinvoice", async (req, res) => {
+app.post("/getinvoices", async (req, res) => {
   // const {datas} = req.body
   let InvoiceData =[]
   // var d = new Date(Date.now());
