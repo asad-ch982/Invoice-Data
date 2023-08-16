@@ -80,6 +80,17 @@ app.post("/getinvoices", async (req, res) => {
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
 });
+app.post("/invoice", async (req, res) => {
+  const {data} = req.body
+        console.log(data)
+        var d = new Date(Date.now());
+       const date= d.toLocaleDateString('en-GB');
+        // dd/mm/yyyy
+
+        let u =  Invoices({data:data,date:date,InvoiceId:data.id});
+        await u.save();
+        res.status(205).json({success:true})
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
