@@ -197,7 +197,7 @@ app.post("/updateStatus",jsonParser, async (req, res) => {
 app.put("/delinvoice",jsonParser, async (req, res) => {
   const {id} = req.body
   const invoice = await Invoices.findOne({id:id})
-  const invoiceDetail = await InvoiceDetail.findOne({id:invoice.InvoiceId})
+  const invoiceDetail = await InvoiceDetail.findOne({id:invoice.id})
   if (invoice && invoiceDetail) {
     const del = await Invoices.findByIdAndRemove(invoice._id)
     const deli = await InvoiceDetail.findByIdAndRemove(invoiceDetail._id)
