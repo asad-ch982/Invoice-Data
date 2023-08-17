@@ -152,25 +152,26 @@ app.post("/invoice",jsonParser, async (req, res) => {
 app.post("/getinvoicedetail",jsonParser, async (req, res) => {
   // const {id}=req.body
   // const invoice = await Invoices.findOne({id:id})
-  try {
-  var d = new Date(Date.now());
-  const date= d.toLocaleDateString('en-GB');
-  const invoiceDetail = await InvoiceDetail.find({date:date})
-  let data=[]
-  if ( invoiceDetail) {
-    for (const key in invoiceDetail) {
-      if (invoiceDetail.hasOwnProperty(key) && invoiceDetail[key].data) {
-          data.push(invoiceDetail[key].data); 
-      } 
-  }
-     res.status(200).json({data:data})
-  }else if(!invoiceDetail){
-    res.status(200)
-    return
-  }
-} catch (error) {
-    console.log(error)
-}
+//   try {
+//   var d = new Date(Date.now());
+//   const date= d.toLocaleDateString('en-GB');
+//   const invoiceDetail = await InvoiceDetail.find({date:date})
+//   let data=[]
+//   if ( invoiceDetail) {
+//     for (const key in invoiceDetail) {
+//       if (invoiceDetail.hasOwnProperty(key) && invoiceDetail[key].data) {
+//           data.push(invoiceDetail[key].data); 
+//       } 
+//   }
+//      res.status(200).json({data:data})
+//   }else if(!invoiceDetail){
+//     res.status(200)
+//     return
+//   }
+// } catch (error) {
+//     console.log(error)
+// }
+res.status(200).send({success:true})
 });
 // UPDATING INVOICE STATUS PAID UNPAID DRAFT
 app.post("/updateStatus",jsonParser, async (req, res) => {
