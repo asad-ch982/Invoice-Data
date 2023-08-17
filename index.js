@@ -110,10 +110,16 @@ app.post("/getcompany", async (req, res) => {
 // GETTING INVOICES API ALL
 app.post("/getinvoices", async (req, res) => {
   // const {datas} = req.body
+  try {
+    
+ 
   let InvoiceData =[]
-  // var d = new Date(Date.now());
-  // const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
-  let data  = await Invoices.find()
+  var d = new Date(Date.now());
+  const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
+  let data  = await Invoices.find({date:date})
+  if (data) {
+    
+  
   for (const key in data) {
       if (data.hasOwnProperty(key) && data[key].data) {
           InvoiceData.push(...data[key].data); 
@@ -121,6 +127,13 @@ app.post("/getinvoices", async (req, res) => {
   }
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
+  }else if (!data) {
+    res.status(400)
+    return
+  }
+} catch (error) {
+  console.log(error)
+}
 });
 
 // ADDING INVOICE API NEW INVOICE
@@ -140,6 +153,9 @@ app.post("/invoice",jsonParser, async (req, res) => {
 app.post("/getinvoicedetail",jsonParser, async (req, res) => {
   // const {id}=req.body
   // const invoice = await Invoices.findOne({id:id})
+  try {
+    
+ 
   var d = new Date(Date.now());
   const date= d.toLocaleDateString('en-GB');
   const invoiceDetail = await InvoiceDetail.find({date:date})
@@ -151,9 +167,13 @@ app.post("/getinvoicedetail",jsonParser, async (req, res) => {
       } 
   }
      res.status(200).json({data:data})
-  }else{
+  }else if(!invoiceDetail){
     res.status(400)
+    return
   }
+} catch (error) {
+    console.log(error)
+}
 });
 // UPDATING INVOICE STATUS PAID UNPAID DRAFT
 app.post("/updateStatus",jsonParser, async (req, res) => {
