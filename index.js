@@ -14,17 +14,13 @@ var bodyParser = require('body-parser')
 const mongoose = require("mongoose");
 const InvoiceDetail = require("./models/InvoiceDetail");
 app.use(bodyParser.json({limit: '50mb'}));
-app.use(cors({credentials: true, origin: true}));
+app.use(cors());
 var jsonParser = bodyParser.json()
 app.post("/",jsonParser, async (req, res) => {
  
 
 });
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://bawa-invoice-gpq7.vercel.app"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+
 // UPDATING CLIENT API
 app.post("/updateclient",jsonParser, async (req, res) => {
   const {billingAddress,email,mobileNo,name,id,image,_id}=req.body.client
