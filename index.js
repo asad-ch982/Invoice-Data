@@ -114,9 +114,9 @@ app.post("/getinvoices", async (req, res) => {
     
  
   let InvoiceData =[]
-  var d = new Date(Date.now());
-  const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
-  let data  = await Invoices.find({date:date})
+  // var d = new Date(Date.now());
+  // const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
+  let data  = await Invoices.find({date:req.body.date})
   if (data!==[]) {
   
   for (const key in data) {
