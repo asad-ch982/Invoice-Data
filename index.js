@@ -20,7 +20,11 @@ app.post("/",jsonParser, async (req, res) => {
  
 
 });
-
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://bawa-invoice-gpq7.vercel.app"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 // UPDATING CLIENT API
 app.post("/updateclient",jsonParser, async (req, res) => {
   const {billingAddress,email,mobileNo,name,id,image,_id}=req.body.client
