@@ -137,9 +137,8 @@ app.post("/getinvoices", async (req, res) => {
 
 // ADDING INVOICE API NEW INVOICE
 app.post("/invoice",jsonParser, async (req, res) => {
-  const {invoice,invoicedetail} = req.body
-        var d = new Date(Date.now());
-       const date= d.toLocaleDateString('en-GB');
+  const {invoice,invoicedetail,date} = req.body
+
        const code = Date.now()
         // dd/mm/yyyy
         let u =  Invoices({data:invoice,date:date,InvoiceId:code,id:invoice.id});
