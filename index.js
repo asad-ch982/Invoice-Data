@@ -198,8 +198,8 @@ app.post("/updateStatus",jsonParser, async (req, res) => {
 });
 
 // DELETING INVOICE API 
-app.post("/delinvoice:id",jsonParser, async (req, res) => {
-  const {id} = req.params
+app.put("/delinvoice",jsonParser, async (req, res) => {
+  const {id} = req.body
   const invoice = await Invoices.findOne({id:id})
   const invoiceDetail = await InvoiceDetail.findOne({id:invoice.InvoiceId})
   if (invoice && invoiceDetail) {
