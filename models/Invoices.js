@@ -14,6 +14,9 @@ const InvoicesSchema = new mongoose.Schema({
         InvoiceId:{
             type:String,
             required:true
+        },id:{
+            type:String,
+            required:true
         }
 },{timestamps:true,
 });

@@ -3,73 +3,111 @@ const app = express();
 const port = 5000;
 const connecttomongo = require("./db");
 require('dotenv').config();
-const mongodb = require("mongodb");
 connecttomongo();
-const MongoClient = require("mongodb").MongoClient;
 const User = require("./models/User");
 const Invoices = require("./models/Invoices")
 const Prod = require("./models/Prod")
+const Company =require("./models/Company")
+const Clients =require("./models/Clients")
 const cors = require('cors');
 var bodyParser = require('body-parser')
-const mongo = new MongoClient(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-
-  useUnifiedTopology: true,
-});
+const mongoose = require("mongoose");
+const InvoiceDetail = require("./models/InvoiceDetail");
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors());
 var jsonParser = bodyParser.json()
+app.post("/",jsonParser, async (req, res) => {
+ 
 
-app.get("/mongo-video3", async (req, res) => {
-  try {
-    const id = req.query.id;
-    let user = await User.findById(id);
-    if (user.plan === true) {
-      const range = req.headers.range;
-      if (!range) {
-        res.status(400).send("Requires Range header");
-      }
-      const db = mongo.db("videos2");
-      filename = "bigbuck2";
-      // GridFS Collection
-      const video = await db
-        .collection("fs.files")
-        .findOne({ filename: filename });
-      if (!video) {
-        res.status(404).send("No video uploaded!");
-        return;
-      }
-
-      // Create response headers
-      const videoSize = video.length;
-      const start = Number(range.replace(/\D/g, ""));
-      const end = videoSize - 1;
-
-      const contentLength = end - start + 1;
-      const headers = {
-        "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-        "Accept-Ranges": "bytes",
-        "Content-Length": contentLength,
-        "Content-Type": "video/mp4",
-      };
-
-      // HTTP Status 206 for Partial Content
-      res.writeHead(206, headers);
-
-      const bucket = new mongodb.GridFSBucket(db);
-      const downloadStream = await bucket.openDownloadStreamByName(filename, {
-        start,
-        end,
-      });
-
-      // Finally pipe video to response
-      downloadStream.pipe(res);
-    } else {
-      res.status(400).send({ user });
-    }
-  } catch (error) {
-    console.error(error.message);
-  }
 });
+
+// UPDATING CLIENT API
+app.post("/updateclient",jsonParser, async (req, res) => {
+  const {billingAddress,email,mobileNo,name,id,image,_id}=req.body.client
+    const client = await Clients.findOneAndUpdate({_id:_id},{
+      billingAddress:billingAddress,
+      email:email,
+      mobileNo:mobileNo,
+      name:name,
+      id:id,
+      image:image
+    })
+    if (client) {
+      res.status(200).json({success:true})
+    } else{
+      res.status(400)
+    }
+});
+
+// DELETING CLIENT API
+app.post("/delclient",jsonParser, async (req, res) => {
+  
+  const existingClient = await Clients.findOne({id:req.body.id})
+    const del = await Clients.findByIdAndRemove(existingClient._id)
+    if (del) {
+      res.status(200).json({success:true})
+    } else{
+      res.status(400)
+    }
+});
+
+// GETTING CLIENTS API ALL
+app.post("/getclients", async (req, res) => {
+  let clients  = await Clients.find()
+  res.status(200).json({clients})
+
+});
+
+
+// ADDING CLIENT API
+app.post("/addclient",jsonParser, async (req, res) => {
+  const {billingAddress,email,mobileNo,name,id,image}=req.body.client
+  const u = await Clients({
+    billingAddress:billingAddress,
+    email:email,
+    mobileNo:mobileNo,
+    name:name,
+    id:id,
+    image:image
+  })
+  await u.save()
+  res.status(200).json({success:true})
+});
+
+
+// ADDING COMPANY DATA API
+app.post("/addcompany",jsonParser, async (req, res) => {
+  
+    const {billingAddress,companyEmail,companyMobile,companyName,id,image}=req.body.company
+    const existingCompany = await Company.findOne({companyEmail:companyEmail})
+    if (existingCompany) {
+    // const del = await Company.findByIdAndRemove(existingCompany._id)
+    res.status(200).json({success:true})
+    return
+    }else {
+    const u = await Company({
+      billingAddress:billingAddress,
+      companyEmail:companyEmail,
+      companyMobile:companyMobile,
+      companyName:companyName,
+      id:id,
+      image:image
+    })
+    await u.save()
+  }
+  res.status(200).json({success:true})
+    // }
+  // res.status(200).json({data:"ok"})
+});
+
+// GETTING COMPANY DATA API
+app.post("/getcompany", async (req, res) => {
+ 
+  let company  = await Company.findOne()
+  res.status(200).json({company})
+  // res.status(200).json({data:"ok"})
+});
+// GETTING INVOICES API ALL
 app.post("/getinvoices", async (req, res) => {
   // const {datas} = req.body
   let InvoiceData =[]
@@ -84,17 +122,96 @@ app.post("/getinvoices", async (req, res) => {
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
 });
+
+// ADDING INVOICE API NEW INVOICE
 app.post("/invoice",jsonParser, async (req, res) => {
-  const {data} = req.body
-        console.log(data)
+  const {invoice,invoicedetail} = req.body
         var d = new Date(Date.now());
        const date= d.toLocaleDateString('en-GB');
+       const code = Date.now()
         // dd/mm/yyyy
-
-        let u =  Invoices({data:data,date:date,InvoiceId:data.id});
+        let u =  Invoices({data:invoice,date:date,InvoiceId:code,id:invoice.id});
         await u.save();
+        let p = await InvoiceDetail({data:invoicedetail,date:date,id:invoice.id})
+        await p.save()
         res.status(205).json({success:true})
 });
+// GETTING INVOICE DETAIL
+app.post("/getinvoicedetail",jsonParser, async (req, res) => {
+  // const {id}=req.body
+  // const invoice = await Invoices.findOne({id:id})
+  var d = new Date(Date.now());
+  const date= d.toLocaleDateString('en-GB');
+  const invoiceDetail = await InvoiceDetail.find({date:date})
+  let data=[]
+  if ( invoiceDetail) {
+    for (const key in invoiceDetail) {
+      if (invoiceDetail.hasOwnProperty(key) && invoiceDetail[key].data) {
+          data.push(invoiceDetail[key].data); 
+      } 
+  }
+     res.status(200).json({data:data})
+  }else{
+    res.status(400)
+  }
+});
+// UPDATING INVOICE STATUS PAID UNPAID DRAFT
+app.post("/updateStatus",jsonParser, async (req, res) => {
+ const {data} = req.body
+  const {statusName,statusIndex} = data
+  try {
+    
+ 
+ const invoiceDetail = await InvoiceDetail.findOne({id:data.id})
+ const delta = invoiceDetail.data 
+ const dalta = {...delta,statusIndex,statusName}
+ const invoiceDetailUp = await InvoiceDetail.findOneAndUpdate({id:data.id},{
+  data:dalta
+ })
+ const datai =[
+  {
+    id:data.id,
+    invoiceNo:data.invoiceNo,
+    statusName:data.statusName,
+    statusIndex:data.statusIndex,
+    totalAmount:data.totalAmount,
+    dueDate:data.dueDate,
+    createdDate:data.createdDate,
+    clientName:data.clientDetail.name
+
+
+  }
+ ]
+
+ const invoice = await Invoices.findOneAndUpdate({id:data.id},{
+  data:datai
+ })
+ res.status(200).send({suceess:true})
+} catch (error) {
+    console.log(error)
+}
+  
+});
+
+// DELETING INVOICE API 
+app.post("/delinvoice",jsonParser, async (req, res) => {
+  const {id} = req.body
+  const invoice = await Invoices.findOne({id:id})
+  const invoiceDetail = await InvoiceDetail.findOne({id:invoice.InvoiceId})
+  if (invoice && invoiceDetail) {
+    const del = await Invoices.findByIdAndRemove(invoice._id)
+    const deli = await InvoiceDetail.findByIdAndRemove(invoiceDetail._id)
+      if (del && deli) {
+        res.status(200).json({success:true})
+      } else{
+        res.status(400)
+      }
+  }else{
+    res.status(400)
+  }
+      
+});
+// GETTING PRODUCTS API ALL
 app.post("/getprod",jsonParser, async (req, res) => {
   let products=[]
   let data = await Prod.find()
@@ -105,10 +222,40 @@ app.post("/getprod",jsonParser, async (req, res) => {
   }
   res.status(200).json(products)
 });
+// DELETING PRODUCTS API
+app.post("/delprod",jsonParser, async (req, res) => {
+  const existingProd = await Prod.findOne({slug:req.body.slug})
+  const del = await Prod.findByIdAndRemove(existingProd._id)
+  if (del) {
+    res.status(200).json({success:true})
+  } else{
+    res.status(400)
+  }
+
+});
+// UPDATING PRODUCTS API
+app.post("/updateprod",jsonParser, async (req, res) => {
+  const {name,slug,image,productID,amount,availableQty}= req.body.prod
+  const existingProd = await Prod.findOne({slug:slug})
+
+  let newprod = []
+  newprod.push(req.body.prod)
+ 
+  const prod = await Prod.findOneAndUpdate({slug:slug},{
+    data:newprod
+  })
+  if (prod) {
+    res.status(200).json({success:true})
+  } else{
+    res.status(400)
+  }
+
+});
+
+
+// ADDING PRODUCTS API
 app.post("/addprod",jsonParser, async (req, res) => {
-  console.log(req.body)
   const {name,slug,image,productID,amount,availableQty}= req.body.data
-  console.log(req.body.data)
   let p = new Prod({
      data:req.body.data,slug:slug
   })
