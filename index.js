@@ -117,8 +117,7 @@ app.post("/getinvoices", async (req, res) => {
   var d = new Date(Date.now());
   const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
   let data  = await Invoices.find({date:date})
-  if (data) {
-    
+  if (data!==[]) {
   
   for (const key in data) {
       if (data.hasOwnProperty(key) && data[key].data) {
@@ -127,7 +126,7 @@ app.post("/getinvoices", async (req, res) => {
   }
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
-  }else if (!data) {
+  }else if (data===[]) {
     res.status(400)
     return
   }
@@ -154,8 +153,6 @@ app.post("/getinvoicedetail",jsonParser, async (req, res) => {
   // const {id}=req.body
   // const invoice = await Invoices.findOne({id:id})
   try {
-    
- 
   var d = new Date(Date.now());
   const date= d.toLocaleDateString('en-GB');
   const invoiceDetail = await InvoiceDetail.find({date:date})
