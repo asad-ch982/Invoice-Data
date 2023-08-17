@@ -14,7 +14,7 @@ var bodyParser = require('body-parser')
 const mongoose = require("mongoose");
 const InvoiceDetail = require("./models/InvoiceDetail");
 app.use(bodyParser.json({limit: '50mb'}));
-app.use(cors());
+app.use(cors({credentials: true, origin: true}));
 var jsonParser = bodyParser.json()
 app.post("/",jsonParser, async (req, res) => {
  
