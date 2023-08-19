@@ -138,13 +138,38 @@ app.post("/getinvoices", async (req, res) => {
 // ADDING INVOICE API NEW INVOICE
 app.post("/invoice",jsonParser, async (req, res) => {
   const {invoice,invoicedetail,date} = req.body
-
        const code = Date.now()
+      //  let products = invoicedetail.products
+      //  console.log(products)
+      //  for (let id in products) {
+      //   console.log(products[id].quantity)
+      //  }
         // dd/mm/yyyy
         let u =  Invoices({data:invoice,date:date,InvoiceId:code,id:invoice.id});
         await u.save();
         let p = await InvoiceDetail({data:invoicedetail,date:date,id:invoice.id})
         await p.save()
+        res.status(205).json({success:true})
+});
+// MINUS PRODUCTS AFTER INVOICE
+app.post("/minusprod",jsonParser, async (req, res) => {
+  const {invoicedetail} = req.body
+ 
+       let products = invoicedetail.products
+       
+       for (let slug in products) {
+        const prods = await Prod.findOne({slug:products[slug].slug})
+        if (prods) {
+          let availableQty = prods.data[0].availableQty - products[slug].quantity
+        let newdata = {...prods.data[0],availableQty} 
+            const change = await Prod.findOneAndUpdate({slug:products[slug].slug},{
+              data:newdata
+            })
+        }
+        
+       }
+        // dd/mm/yyyy
+    
         res.status(205).json({success:true})
 });
 // GETTING INVOICE DETAIL
@@ -282,5 +307,5 @@ app.post("/addprod",jsonParser, async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Example app listening on port http://localhost:${port}`);
 });
