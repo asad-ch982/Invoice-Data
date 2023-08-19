@@ -149,6 +149,19 @@ app.post("/invoice",jsonParser, async (req, res) => {
         await u.save();
         let p = await InvoiceDetail({data:invoicedetail,date:date,id:invoice.id})
         await p.save()
+        let products = invoicedetail.products
+       
+        for (let slug in products) {
+         const prods = await Prod.findOne({slug:products[slug].slug})
+         if (prods) {
+           let availableQty = prods.data[0].availableQty - products[slug].quantity
+         let newdata = {...prods.data[0],availableQty} 
+             const change = await Prod.findOneAndUpdate({slug:products[slug].slug},{
+               data:newdata
+             })
+         }
+         
+        }
         res.status(205).json({success:true})
 });
 // MINUS PRODUCTS AFTER INVOICE
