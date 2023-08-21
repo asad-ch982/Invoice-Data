@@ -164,6 +164,13 @@ app.post("/invoice",jsonParser, async (req, res) => {
         }
         res.status(205).json({success:true})
 });
+// CUSTOMIZE DATE FETCHING 
+app.post("/cusinvoice",jsonParser, async (req, res) => {
+  const {start,end}= req.body
+        const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        res.status(200).json({invoices:invoices,invoiceDetailList:invoicesDetail})
+});
 // MINUS PRODUCTS AFTER INVOICE
 app.post("/minusprod",jsonParser, async (req, res) => {
   const {invoicedetail} = req.body
