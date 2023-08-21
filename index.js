@@ -166,10 +166,17 @@ app.post("/invoice",jsonParser, async (req, res) => {
 });
 // CUSTOMIZE DATE FETCHING 
 app.post("/cusinvoice",jsonParser, async (req, res) => {
+  try {
+    
+  
   const {start,end}= req.body
         const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
         const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        res.status(200).json({invoices:invoices,invoiceDetailList:invoicesDetail})
+        res.status(205).json({invoices:invoices,invoiceDetailList:invoicesDetail}).send({success:true})
+      } catch (error) {
+          console.log(error)
+          res.status(200)
+      }
 });
 // MINUS PRODUCTS AFTER INVOICE
 app.post("/minusprod",jsonParser, async (req, res) => {
@@ -197,8 +204,6 @@ app.post("/getinvoicedetail",jsonParser, async (req, res) => {
   // const {id}=req.body
   // const invoice = await Invoices.findOne({id:id})
   try {
-  var d = new Date(Date.now());
-  const date= d.toLocaleDateString('en-GB');
   const invoiceDetail = await InvoiceDetail.find({date:req.body.date})
   let data=[]
   if ( invoiceDetail) {
