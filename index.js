@@ -173,15 +173,14 @@ app.post("/cusinvoice",jsonParser, async (req, res) => {
   console.log(start,end)
         const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
         const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        console.log({invoices:invoices,invoiceDetailList:invoicesDetail})
         if (invoices && invoicesDetail) {
-          res.status(205).json({invoices:invoices,invoiceDetailList:invoicesDetail})
+          res.status(200).json({invoices:invoices,invoiceDetailList:invoicesDetail})
         }
         
         
       } catch (error) {
           console.log(error)
-          res.status(200)
+          res.status(400)
       }
 });
 // MINUS PRODUCTS AFTER INVOICE
