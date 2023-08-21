@@ -173,11 +173,23 @@ app.post("/cusinvoice",jsonParser, async (req, res) => {
   console.log(start,end)
         const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
         const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        if (invoices && invoicesDetail) {
-          res.status(200).json({invoices:invoices,invoiceDetailList:invoicesDetail})
+        let invoiceData = []
+        let invoiceDetailData = []
+      
+         for (const key in invoicesDetail) {
+           if (invoicesDetail.hasOwnProperty(key) && invoicesDetail[key].data) {
+             invoiceDetailData.push(invoicesDetail[key].data); 
+           } 
+       }
+       for (const key in invoices) {
+         if (invoices.hasOwnProperty(key) && invoices[key].data) {
+             invoiceData.push(...invoices[key].data); 
+         } 
+     }
+        
+        if (invoiceData && invoiceDetailData) {
+          res.status(200).json({invoices:invoiceData,invoiceDetailList:invoiceDetailData})
         }
-        
-        
       } catch (error) {
           console.log(error)
           res.status(400)
