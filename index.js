@@ -174,31 +174,32 @@ app.post("/cusinvoice",jsonParser, async (req, res) => {
   console.log(start,end)
         const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
         const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        if (invoices && invoiceDetailList) {
+        console.log(invoices,invoiceDetailList)
+      //   if (invoices && invoiceDetailList) {
          
-          let invoiceData = []
-          let invoiceDetailData = []
-           for (const key in invoiceDetailList) {
-             if (invoiceDetailList.hasOwnProperty(key) && invoiceDetailList[key].data) {
-               invoiceDetailData.push(invoiceDetailList[key].data); 
-             } 
-         }
-         for (const key in invoices) {
-           if (invoices.hasOwnProperty(key) && invoices[key].data) {
-               invoiceData.push(...invoices[key].data); 
-           } 
-       }
-       const data = [invoiceData,invoiceDetailData]
-          res.setHeader('Content-Type', 'application/json');
+      //     let invoiceData = []
+      //     let invoiceDetailData = []
+      //      for (const key in invoiceDetailList) {
+      //        if (invoiceDetailList.hasOwnProperty(key) && invoiceDetailList[key].data) {
+      //          invoiceDetailData.push(invoiceDetailList[key].data); 
+      //        } 
+      //    }
+      //    for (const key in invoices) {
+      //      if (invoices.hasOwnProperty(key) && invoices[key].data) {
+      //          invoiceData.push(...invoices[key].data); 
+      //      } 
+      //  }
+      //  const data = [invoiceData,invoiceDetailData]
+      //     res.setHeader('Content-Type', 'application/json');
   
-          data.forEach((item) => {
-            res.write(JSON.stringify(item) + '\n');
-          });
+      //     data.forEach((item) => {
+      //       res.write(JSON.stringify(item) + '\n');
+      //     });
           
-          res.end();
-        }
+      //     res.end();
+      //   }
         
-        
+        res.status(200)
       } catch (error) {
           console.log(error)
           res.status(400)
