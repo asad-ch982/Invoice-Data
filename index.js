@@ -118,7 +118,7 @@ app.post("/getinvoices", async (req, res) => {
   // var d = new Date(Date.now());
   // const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
   let data  = await Invoices.find({date:req.body.date})
-  if (data!==[]) {
+  if (data) {
   
   for (const key in data) {
       if (data.hasOwnProperty(key) && data[key].data) {
@@ -127,7 +127,7 @@ app.post("/getinvoices", async (req, res) => {
   }
   res.status(200).json({data:InvoiceData})
   // res.status(200).json({data:"ok"})
-  }else if (data===[]) {
+  }else if (!data) {
     res.status(400)
     return
   }
@@ -212,10 +212,10 @@ app.post("/cusinvoicedata",jsonParser, async (req, res) => {
   try {
     
   
-  const {start,end,data}= req.body
-  const query = {
-    $or:data
-  }
+  const {start,end}= req.body
+  // const query = {
+  //   $or:data
+  // }
 //   const id = "L5jyvXftWle8HfDXE5SOe"
 //   const invoiceDetailList = await InvoiceDetail.findOne({id:id})
  
@@ -230,7 +230,7 @@ app.post("/cusinvoicedata",jsonParser, async (req, res) => {
 //     res.status(200).json({success:true})
 //   }
 
-        const invoiceDetailList = await InvoiceDetail.find(query)
+        const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
    
         if (invoiceDetailList) {
          
