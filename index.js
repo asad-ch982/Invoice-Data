@@ -210,25 +210,23 @@ app.post("/cusinvoicedata",jsonParser, async (req, res) => {
   try {
     
   
-  const {start,end}= req.body
-  console.log(start,end)
-        // const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        // console.log(invoices,invoiceDetailList)
+  const {start,end,data}= req.body
+  const query = {
+    $or:data
+  }
+  const invoiceDetailList = await InvoiceDetail.find(query)
+ 
+        // const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+   
         if (invoiceDetailList) {
          
-          // let invoiceData = []
+     
           let invoiceDetailData = []
            for (const key in invoiceDetailList) {
              if (invoiceDetailList.hasOwnProperty(key) && invoiceDetailList[key].data) {
                invoiceDetailData.push(invoiceDetailList[key].data); 
              } 
-         }
-      //    for (const key in invoices) {
-      //      if (invoices.hasOwnProperty(key) && invoices[key].data) {
-      //          invoiceData.push(...invoices[key].data); 
-      //      } 
-      //  }
+            }
        const data = [invoiceDetailData]
           res.setHeader('Content-Type', 'application/json');
   
