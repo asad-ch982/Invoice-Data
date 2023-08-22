@@ -13,6 +13,7 @@ const cors = require('cors');
 var bodyParser = require('body-parser')
 const mongoose = require("mongoose");
 const InvoiceDetail = require("./models/InvoiceDetail");
+const JSONStream = require('JSONStream');
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors());
 var jsonParser = bodyParser.json()
@@ -171,12 +172,17 @@ app.post("/cusinvoice",jsonParser, async (req, res) => {
   
   const {start,end}= req.body
   console.log(start,end)
-        // const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        // const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
-        const invoices = await Invoices.find()
-        const invoicesDetail = await InvoiceDetail.find()
+        const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        const invoicesDetail = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
         if (invoices && invoicesDetail) {
-          res.status(200).json({invoices:invoices,invoiceDetailList:invoicesDetail})
+          const data = [invoices,invoicesDetail]
+          res.setHeader('Content-Type', 'application/json');
+  
+          data.forEach((item) => {
+            res.write(JSON.stringify(item) + '\n');
+          });
+          
+          res.end();
         }
         
         
