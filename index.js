@@ -212,10 +212,10 @@ app.post("/cusinvoicedata",jsonParser, async (req, res) => {
   try {
     
   
-  const {start,end}= req.body
-  // const query = {
-  //   $or:data
-  // }
+  const {start,end,data}= req.body
+  const query = {
+    $or:data
+  }
 //   const id = "L5jyvXftWle8HfDXE5SOe"
 //   const invoiceDetailList = await InvoiceDetail.findOne({id:id})
  
@@ -230,7 +230,7 @@ app.post("/cusinvoicedata",jsonParser, async (req, res) => {
 //     res.status(200).json({success:true})
 //   }
 
-        const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        const invoiceDetailList = await InvoiceDetail.find(query)
    
         if (invoiceDetailList) {
          
