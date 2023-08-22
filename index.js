@@ -205,6 +205,46 @@ app.post("/cusinvoice",jsonParser, async (req, res) => {
           res.status(400)
       }
 });
+// CUSTOMIZE DATE FETCHING 
+app.post("/cusinvoicedata",jsonParser, async (req, res) => {
+  try {
+    
+  
+  const {start,end}= req.body
+  console.log(start,end)
+        // const invoices = await Invoices.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        const invoiceDetailList = await InvoiceDetail.find({createdAt:{"$gt" : start+"T00:00:00.000Z","$lt" : end+"T23:59:59.000Z"}})
+        // console.log(invoices,invoiceDetailList)
+        if (invoiceDetailList) {
+         
+          // let invoiceData = []
+          let invoiceDetailData = []
+           for (const key in invoiceDetailList) {
+             if (invoiceDetailList.hasOwnProperty(key) && invoiceDetailList[key].data) {
+               invoiceDetailData.push(invoiceDetailList[key].data); 
+             } 
+         }
+      //    for (const key in invoices) {
+      //      if (invoices.hasOwnProperty(key) && invoices[key].data) {
+      //          invoiceData.push(...invoices[key].data); 
+      //      } 
+      //  }
+       const data = [invoiceDetailData]
+          res.setHeader('Content-Type', 'application/json');
+  
+          data.forEach((item) => {
+            res.write(JSON.stringify(item) + '\n');
+          });
+          
+          res.end();
+        }
+        
+       
+      } catch (error) {
+          console.log(error)
+          res.status(400)
+      }
+});
 // MINUS PRODUCTS AFTER INVOICE
 app.post("/minusprod",jsonParser, async (req, res) => {
   const {invoicedetail} = req.body
