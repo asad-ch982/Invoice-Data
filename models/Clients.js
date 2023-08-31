@@ -12,7 +12,6 @@ const CLientsSchema = new mongoose.Schema({
 },
 image:{
     type:String,
-    required:true
 },
 name:{
     type:String,
