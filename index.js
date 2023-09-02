@@ -15,35 +15,59 @@ var bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const InvoiceDetail = require("./models/InvoiceDetail");
 const JSONStream = require("JSONStream");
+const jwt = require("jsonwebtoken")
+const auth = require("./middleware/auth")
+const salesauth = require("./middleware/salesauth")
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 var jsonParser = bodyParser.json();
 app.post("/", jsonParser, async (req, res) => {});
 
 // SETTING AUTHENTICATE API
-app.post("/setauth", jsonParser, async (req, res) => {
-  const { owner, salesman } = req.body;
-  const u = await Auth({
-    owner: owner,
-    salesman: salesman,
-  });
-  await u.save();
-  res.status(200).json({ success: true });
+app.post("/verifyauth", jsonParser, async (req, res) => {
+  const { token } = req.body;
+  const user =  jwt.verify(token,process.env.JWT_SECRET)
+  if (user) {
+    console.log(user)
+    res.status(200).json({token:token,type:user.type})
+  }else{
+    res.status(400)
+    return
+  }
+  
+ 
 });
 // GETTING AUTHENTICATE API
-app.post("/getauth", jsonParser, async (req, res) => {
-  const { authno } = req.body;
-  console.log(authno);
-  const auth = await Auth.findOne();
-  if (authno === auth.owner) {
-    res.status(200).json({ type: "OWNER", authNo: auth.owner });
-  } else if (authno === auth.salesman) {
-    res.status(200).json({ type: "SALESMAN", authNo: auth.salesman });
-  } else {
-    res.status(400).json({ success: false });
+app.post("/getauth", jsonParser,salesauth, async (req, res) => {
+  const { ID,password } = req.body;
+  const auth = await Auth.findOne({ID:ID});
+  if (auth) {
+    if (auth.password===password) {
+      const token =  jwt.sign({ID:auth.ID,type:auth.type},process.env.JWT_SECRET)
+      console.log(token)
+      res.status(200).json({token:token,type:auth.type})
+      return
+    }
+
+
+
+
+
+    
   }
 });
 
+// ADDING AUTHENTICATE USER
+app.post("/addauth", jsonParser, async (req, res) => {
+  const {type,password,ID} = req.body
+  const u = await Auth({
+    type:type,
+    password:password,
+    ID:ID
+  })
+  await u.save()
+  res.status(200).json({success:true})
+});
 // UPDATING CLIENT API
 app.post("/updateclient", jsonParser, async (req, res) => {
   const { billingAddress, email, mobileNo, name, id, image, _id } =
@@ -78,7 +102,7 @@ app.post("/delclient", jsonParser, async (req, res) => {
 });
 
 // GETTING CLIENTS API ALL
-app.post("/getclients", async (req, res) => {
+app.post("/getclients",jsonParser,salesauth, async (req, res) => {
   let clients = await Clients.find();
   res.status(200).json({ clients });
 });
@@ -136,7 +160,7 @@ app.post("/getcompany", async (req, res) => {
   // res.status(200).json({data:"ok"})
 });
 // GETTING INVOICES API ALL
-app.post("/getinvoices", async (req, res) => {
+app.post("/getinvoices",jsonParser,salesauth, async (req, res) => {
   // const {datas} = req.body
   try {
     let InvoiceData = [];
@@ -283,7 +307,7 @@ app.post("/minusprod", jsonParser, async (req, res) => {
   res.status(205).json({ success: true });
 });
 // GETTING INVOICE DETAIL
-app.post("/getinvoicedetail", jsonParser, async (req, res) => {
+app.post("/getinvoicedetail", jsonParser,salesauth, async (req, res) => {
   // const {id}=req.body
   // const invoice = await Invoices.findOne({id:id})
   try {
@@ -362,7 +386,7 @@ app.post("/delinvoice", jsonParser, async (req, res) => {
   }
 });
 // GETTING PRODUCTS API ALL
-app.post("/getprod", jsonParser, async (req, res) => {
+app.post("/getprod", jsonParser,salesauth, async (req, res) => {
   let products = [];
   let data = await Prod.find();
   for (const key in data) {

@@ -3,12 +3,17 @@ const mongoose = require('mongoose')
 
 const AuthSchema = new mongoose.Schema({
  
-    owner:{
+    ID:{
         type:String,
         required:true
 
     },
-    salesman:{
+    password:{
+        type:String,
+        required:true
+
+    },
+    type:{
         type:String,
         required:true
 
