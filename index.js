@@ -38,7 +38,7 @@ app.post("/verifyauth", jsonParser, async (req, res) => {
  
 });
 // GETTING AUTHENTICATE API
-app.post("/getauth", jsonParser,salesauth, async (req, res) => {
+app.post("/getauth", jsonParser, async (req, res) => {
   const { ID,password } = req.body;
   const auth = await Auth.findOne({ID:ID});
   if (auth) {
@@ -58,7 +58,7 @@ app.post("/getauth", jsonParser,salesauth, async (req, res) => {
 });
 
 // ADDING AUTHENTICATE USER
-app.post("/addauth", jsonParser, async (req, res) => {
+app.post("/addauth", jsonParser,auth, async (req, res) => {
   const {type,password,ID} = req.body
   const u = await Auth({
     type:type,
@@ -69,7 +69,7 @@ app.post("/addauth", jsonParser, async (req, res) => {
   res.status(200).json({success:true})
 });
 // UPDATING CLIENT API
-app.post("/updateclient", jsonParser, async (req, res) => {
+app.post("/updateclient", jsonParser,auth, async (req, res) => {
   const { billingAddress, email, mobileNo, name, id, image, _id } =
     req.body.client;
   const client = await Clients.findOneAndUpdate(
@@ -91,7 +91,7 @@ app.post("/updateclient", jsonParser, async (req, res) => {
 });
 
 // DELETING CLIENT API
-app.post("/delclient", jsonParser, async (req, res) => {
+app.post("/delclient", jsonParser,auth, async (req, res) => {
   const existingClient = await Clients.findOne({ id: req.body.id });
   const del = await Clients.findByIdAndRemove(existingClient._id);
   if (del) {
@@ -108,7 +108,7 @@ app.post("/getclients",jsonParser,salesauth, async (req, res) => {
 });
 
 // ADDING CLIENT API
-app.post("/addclient", jsonParser, async (req, res) => {
+app.post("/addclient", jsonParser,salesauth, async (req, res) => {
   const { billingAddress, email, mobileNo, name, id, image } = req.body.client;
   const u = await Clients({
     billingAddress: billingAddress,
@@ -123,7 +123,7 @@ app.post("/addclient", jsonParser, async (req, res) => {
 });
 
 // ADDING COMPANY DATA API
-app.post("/addcompany", jsonParser, async (req, res) => {
+app.post("/addcompany", jsonParser,auth, async (req, res) => {
   const {
     billingAddress,
     companyEmail,
@@ -154,7 +154,7 @@ app.post("/addcompany", jsonParser, async (req, res) => {
 });
 
 // GETTING COMPANY DATA API
-app.post("/getcompany", async (req, res) => {
+app.post("/getcompany",jsonParser,salesauth, async (req, res) => {
   let company = await Company.findOne();
   res.status(200).json({ company });
   // res.status(200).json({data:"ok"})
@@ -185,7 +185,7 @@ app.post("/getinvoices",jsonParser,salesauth, async (req, res) => {
 });
 
 // ADDING INVOICE API NEW INVOICE
-app.post("/invoice", jsonParser, async (req, res) => {
+app.post("/invoice", jsonParser,salesauth, async (req, res) => {
   const { invoice, invoicedetail, date } = req.body;
   const code = Date.now();
   //  let products = invoicedetail.products
@@ -227,7 +227,7 @@ app.post("/invoice", jsonParser, async (req, res) => {
   res.status(205).json({ success: true });
 });
 // CUSTOMIZE DATE FETCHING
-app.post("/cusinvoice", jsonParser, async (req, res) => {
+app.post("/cusinvoice", jsonParser,salesauth, async (req, res) => {
   try {
     const { start, end } = req.body;
     console.log(start, end);
@@ -264,7 +264,7 @@ app.post("/cusinvoice", jsonParser, async (req, res) => {
   }
 });
 // CUSTOMIZE DATE FETCHING
-app.post("/getcusinvoicedata", jsonParser, async (req, res) => {
+app.post("/getcusinvoicedata", jsonParser,salesauth, async (req, res) => {
   try {
     const { id } = req.body;
     const invoiceDetailList = await InvoiceDetail.findOne({ id: id });
@@ -284,7 +284,7 @@ app.post("/getcusinvoicedata", jsonParser, async (req, res) => {
   }
 });
 // MINUS PRODUCTS AFTER INVOICE
-app.post("/minusprod", jsonParser, async (req, res) => {
+app.post("/minusprod", jsonParser,salesauth, async (req, res) => {
   const { invoicedetail } = req.body;
 
   let products = invoicedetail.products;
@@ -330,7 +330,7 @@ app.post("/getinvoicedetail", jsonParser,salesauth, async (req, res) => {
   // res.status(200).send({success:true})
 });
 // UPDATING INVOICE STATUS PAID UNPAID DRAFT
-app.post("/updateStatus", jsonParser, async (req, res) => {
+app.post("/updateStatus", jsonParser,auth, async (req, res) => {
   const { data } = req.body;
   const { statusName, statusIndex } = data;
   try {
@@ -369,7 +369,7 @@ app.post("/updateStatus", jsonParser, async (req, res) => {
 });
 
 // DELETING INVOICE API
-app.post("/delinvoice", jsonParser, async (req, res) => {
+app.post("/delinvoice", jsonParser,auth, async (req, res) => {
   const { id } = req.body;
   const invoice = await Invoices.findOne({ id: id });
   const invoiceDetail = await InvoiceDetail.findOne({ id: invoice.id });
@@ -397,7 +397,7 @@ app.post("/getprod", jsonParser,salesauth, async (req, res) => {
   res.status(200).json(products);
 });
 // DELETING PRODUCTS API
-app.post("/delprod", jsonParser, async (req, res) => {
+app.post("/delprod", jsonParser,auth, async (req, res) => {
   const existingProd = await Prod.findOne({ slug: req.body.slug });
   const del = await Prod.findByIdAndRemove(existingProd._id);
   if (del) {
@@ -407,7 +407,7 @@ app.post("/delprod", jsonParser, async (req, res) => {
   }
 });
 // UPDATING PRODUCTS API
-app.post("/updateprod", jsonParser, async (req, res) => {
+app.post("/updateprod", jsonParser,auth, async (req, res) => {
   const { name, slug, image, productID, amount, availableQty } = req.body.prod;
   const existingProd = await Prod.findOne({ slug: slug });
 
@@ -428,7 +428,7 @@ app.post("/updateprod", jsonParser, async (req, res) => {
 });
 
 // ADDING PRODUCTS API
-app.post("/addprod", jsonParser, async (req, res) => {
+app.post("/addprod", jsonParser,auth, async (req, res) => {
   const { name, slug, image, productID, amount, availableQty } = req.body.data;
   let p = new Prod({
     data: req.body.data,
