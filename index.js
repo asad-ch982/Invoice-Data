@@ -36,6 +36,7 @@ app.post("/", jsonParser, async (req, res) => {});
 app.post("/closing", jsonParser,auth, async (req, res) => {
   const {date} = req.body
   const detail = await InvoiceDetail.find({date:date})
+  console.log(date)
      let products = []
          for (const key in detail) {
            if (detail.hasOwnProperty(key) && detail[key].data.products) {
