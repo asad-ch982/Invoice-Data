@@ -12,7 +12,8 @@ const InvoiceDetailSchema = new mongoose.Schema({
     required:true
   },id:{
     type:String,
-    required:true
+    required:true,
+    unique:true
   }
     
 },{timestamps:true}); 

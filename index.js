@@ -2,9 +2,6 @@ const express = require("express");
 const app = express();
 const port = 5000;
 const connecttomongo = require("./db");
-require("dotenv").config();
-connecttomongo();
-const User = require("./models/User");
 const Invoices = require("./models/Invoices");
 const Prod = require("./models/Prod");
 const Company = require("./models/Company");
@@ -12,16 +9,49 @@ const Clients = require("./models/Clients");
 const Auth = require("./models/Auth");
 const cors = require("cors");
 var bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 const InvoiceDetail = require("./models/InvoiceDetail");
-const JSONStream = require("JSONStream");
 const jwt = require("jsonwebtoken")
 const auth = require("./middleware/auth")
 const salesauth = require("./middleware/salesauth")
+// IMPORTS ENDING HERE
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cors());
 var jsonParser = bodyParser.json();
+require("dotenv").config();
+connecttomongo();
+// APP USING BUILT-IN MIDDLEWARE ENDINH HERE
+
+// <-----------------------------------> //
+// API'S STARTING FROM HERE
+
+
 app.post("/", jsonParser, async (req, res) => {});
+
+
+
+
+
+
+// CLOSING API
+app.post("/closing", jsonParser,auth, async (req, res) => {
+  const {date} = req.body
+  const detail = await InvoiceDetail.find({date:date})
+     let products = []
+         for (const key in detail) {
+           if (detail.hasOwnProperty(key) && detail[key].data.products) {
+            products.push(detail[key].data.products);
+           }
+       }
+
+       const mergedArray = [].concat(...products);
+       const combinedObject = {};
+
+mergedArray.forEach((product, index) => {
+  combinedObject[`${index + 1}`] = product;
+});
+
+  res.status(200).json({detail:combinedObject})
+});
 
 // SETTING AUTHENTICATE API
 app.post("/verifyauth", jsonParser, async (req, res) => {
@@ -48,17 +78,14 @@ app.post("/getauth", jsonParser, async (req, res) => {
       res.status(200).json({token:token,type:auth.type})
       return
     }
-
-
-
-
-
-    
+  }else{
+    res.status(400).json({success:false})
+    return
   }
 });
 
 // ADDING AUTHENTICATE USER
-app.post("/addauth", jsonParser,auth, async (req, res) => {
+app.post("/addauth", jsonParser, async (req, res) => {
   const {type,password,ID} = req.body
   const u = await Auth({
     type:type,
