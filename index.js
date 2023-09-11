@@ -78,9 +78,11 @@ app.post("/getauth", jsonParser, async (req, res) => {
       console.log(token)
       res.status(200).json({token:token,type:auth.type,success:true})
       return
+    }else{
+      res.status(404).json({success:false})
     }
   }else{
-    res.status(400).json({success:false})
+    res.status(404).json({success:false})
     return
   }
 });
