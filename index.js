@@ -211,6 +211,33 @@ app.post("/getinvoices",jsonParser,salesauth, async (req, res) => {
     console.log(error);
   }
 });
+// GETTING UNPAID INVOICES
+app.post("/getunpaid",jsonParser,salesauth, async (req, res) => {
+  // const {datas} = req.body
+  try {
+    let InvoiceData = [];
+    // var d = new Date(Date.now());
+    // const date= d.toLocaleDateString('en-GB'); // dd/mm/yyyy
+    let data = await Invoices.find();
+    if (data) {
+      for (const key in data) {
+        if (data.hasOwnProperty(key) && data[key].data) {
+          if (data[key].data[0].statusName==="Unpaid") {
+            InvoiceData.push(...data[key].data);
+          }
+          
+        }
+      }
+      res.status(200).json({ data: InvoiceData });
+      // res.status(200).json({data:"ok"})
+    } else if (!data) {
+      res.status(400);
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 // ADDING INVOICE API NEW INVOICE
 app.post("/invoice", jsonParser,salesauth, async (req, res) => {
