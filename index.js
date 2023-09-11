@@ -76,7 +76,7 @@ app.post("/getauth", jsonParser, async (req, res) => {
     if (auth.password===password) {
       const token =  jwt.sign({ID:auth.ID,type:auth.type},process.env.JWT_SECRET)
       console.log(token)
-      res.status(200).json({token:token,type:auth.type})
+      res.status(200).json({token:token,type:auth.type,success:true})
       return
     }
   }else{
