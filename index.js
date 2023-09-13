@@ -33,7 +33,7 @@ app.post("/", jsonParser, async (req, res) => {});
 
 
 // CLOSING API
-app.post("/closing", jsonParser,auth, async (req, res) => {
+app.post("/closing", jsonParser,salesauth, async (req, res) => {
   const {date} = req.body
   const detail = await InvoiceDetail.find({date:date})
   console.log(date)
