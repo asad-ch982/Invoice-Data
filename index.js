@@ -36,7 +36,8 @@ app.post("/", jsonParser, async (req, res) => {});
 
 // FOR FETCHING CHARTS WEEKLY DAYS BY MONTH
 app.post("/weeklychart", jsonParser,salesauth, async (req, res) => {
-  const {month} = req.body
+  // const {month} = req.body
+  const month = "09"
   const invoices = await Invoices.find({
     createdAt: { $gt:"2023-"+ month + "-01T00:00:00.000Z", $lt:"2023-"+ month + "-31T23:59:59.000Z" },
   })
