@@ -32,6 +32,18 @@ app.post("/", jsonParser, async (req, res) => {});
 
 
 
+
+
+// FOR FETCHING CHARTS WEEKLY DAYS BY MONTH
+app.post("/weeklychart", jsonParser, async (req, res) => {
+  const {month} = req.body
+  const invoices = await Invoices.find({
+    createdAt: { $gt:"2023-"+ month + "-01T00:00:00.000Z", $lt:"2023-"+ month + "-31T23:59:59.000Z" },
+  })
+  res.status(200).json({invoices:invoices})
+});
+
+
 // CLOSING API
 app.post("/closing", jsonParser,salesauth, async (req, res) => {
   const {date} = req.body
@@ -349,8 +361,8 @@ app.post("/minusprod", jsonParser,salesauth, async (req, res) => {
   for (let slug in products) {
     const prods = await Prod.findOne({ slug: products[slug].slug });
     if (prods) {
-      let availableQty = prods.data[0].availableQty - products[slug].quantity;
-      let newdata = { ...prods.data[0], availableQty };
+      let availableQty = await prods.data[0].availableQty - products[slug].quantity;
+      let newdata = await { ...prods.data[0], availableQty };
       const change = await Prod.findOneAndUpdate(
         { slug: products[slug].slug },
         {
