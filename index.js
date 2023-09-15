@@ -35,7 +35,7 @@ app.post("/", jsonParser, async (req, res) => {});
 
 
 // FOR FETCHING CHARTS WEEKLY DAYS BY MONTH
-app.post("/weeklychart", jsonParser, async (req, res) => {
+app.post("/weeklychart", jsonParser,salesauth, async (req, res) => {
   const {month} = req.body
   const invoices = await Invoices.find({
     createdAt: { $gt:"2023-"+ month + "-01T00:00:00.000Z", $lt:"2023-"+ month + "-31T23:59:59.000Z" },
@@ -174,23 +174,20 @@ app.post("/addcompany", jsonParser,auth, async (req, res) => {
     id,
     image,
   } = req.body.company;
-  const existingCompany = await Company.findOne({ companyEmail: companyEmail });
+  const existingCompany = await Company.findOneAndUpdate({ id: id },{
+    billingAddress: billingAddress,
+    companyEmail: companyEmail,
+    companyMobile: companyMobile,
+    companyName: companyName,
+    id: id,
+    image: image,
+  });
   if (existingCompany) {
     // const del = await Company.findByIdAndRemove(existingCompany._id)
     res.status(200).json({ success: true });
     return;
-  } else {
-    const u = await Company({
-      billingAddress: billingAddress,
-      companyEmail: companyEmail,
-      companyMobile: companyMobile,
-      companyName: companyName,
-      id: id,
-      image: image,
-    });
-    await u.save();
-  }
-  res.status(200).json({ success: true });
+  } 
+ 
   // }
   // res.status(200).json({data:"ok"})
 });
