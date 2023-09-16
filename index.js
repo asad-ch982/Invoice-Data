@@ -371,23 +371,23 @@ app.post("/getcusinvoicedata", jsonParser,salesauth, async (req, res) => {
 });
 // MINUS PRODUCTS AFTER INVOICE
 app.post("/minusprod", jsonParser,salesauth, async (req, res) => {
-  const { invoicedetail } = req.body;
+  // const { invoicedetail } = req.body;
 
-  let products = invoicedetail.products;
+  // let products = invoicedetail.products;
 
-  for (let slug in products) {
-    const prods = await Prod.findOne({ slug: products[slug].slug });
-    if (prods) {
-      let availableQty = await prods.data[0].availableQty - products[slug].quantity;
-      let newdata = await { ...prods.data[0], availableQty };
-      const change = await Prod.findOneAndUpdate(
-        { slug: products[slug].slug },
-        {
-          data: newdata,
-        }
-      );
-    }
-  }
+  // for (let slug in products) {
+  //   const prods = await Prod.findOne({ slug: products[slug].slug });
+  //   if (prods) {
+  //     let availableQty = await prods.data[0].availableQty - products[slug].quantity;
+  //     let newdata = await { ...prods.data[0], availableQty };
+  //     const change = await Prod.findOneAndUpdate(
+  //       { slug: products[slug].slug },
+  //       {
+  //         data: newdata,
+  //       }
+  //     );
+  //   }
+  // }
   // dd/mm/yyyy
 
   res.status(205).json({ success: true });
