@@ -276,22 +276,41 @@ app.post("/invoice", jsonParser,salesauth, async (req, res) => {
     id: invoice.id,
   });
   await p.save();
-  let products = invoicedetail.products;
+ 
+  try {
+    let products = invoicedetail.products;; // Assuming you send products data in the request body
 
-  for (let slug in products) {
-    const prods = await Prod.findOne({ slug: products[slug].slug });
-    if (prods) {
-      let availableQty = prods.data[0].availableQty - products[slug].quantity;
-      let newdata = { ...prods.data[0], availableQty };
-      const change = await Prod.findOneAndUpdate(
-        { slug: products[slug].slug },
-        {
-          data: newdata,
-        }
-      );
+    const updatePromises = [];
+
+    for (const slug in products) {
+      const prods = await Prod.findOne({ slug: products[slug].slug });
+
+      if (prods) {
+        const availableQty = prods.data[0].availableQty - products[slug].quantity;
+        const newdata = { ...prods.data[0], availableQty };
+
+        // Push the promise for findOneAndUpdate into the array
+        updatePromises.push(
+          Prod.findOneAndUpdate(
+            { slug: products[slug].slug },
+            {
+              data: newdata,
+            }
+          )
+        );
+      }
     }
+
+    // Wait for all updates to complete
+    await Promise.all(updatePromises);
+
+    // All updates are completed here
+    res.status(205).json({ message: 'All updates completed',success:true });
+  } catch (error) {
+    console.error('Error updating products:', error);
+    res.status(500).json({ error: 'An error occurred while updating products' });
   }
-  res.status(205).json({ success: true });
+
 });
 // CUSTOMIZE DATE FETCHING
 app.post("/cusinvoice", jsonParser,salesauth, async (req, res) => {
