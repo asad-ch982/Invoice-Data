@@ -34,6 +34,43 @@ app.post("/", jsonParser, async (req, res) => {});
 
 
 
+
+// API FOR EDITING AUTHENTICATION 
+app.post("/editauth", jsonParser,auth, async (req, res) => {
+  const {data} = req.body;
+  console.log(data)
+  const auth = await Auth.findOneAndUpdate({_id:data._id},{
+    ID:data.ID,
+    password:data.password
+  })
+  if (auth) {
+    res.status(200).json({success:true})
+  }
+});
+
+
+
+
+
+
+
+// API FOR DELETING AUTHENTICATION
+app.post("/delauth", jsonParser,auth, async (req, res) => {
+  const {id} = req.body;
+  const auth = await Auth.findOneAndRemove({_id:id})
+  if (auth) {
+    res.status(200).json({success:true})
+  }
+});
+
+
+// API FOR ALL THE AUTHENTICATION ACCESS
+app.post("/security", jsonParser,auth, async (req, res) => {
+        const auth = await Auth.find()
+        res.status(200).json({success:true,auth:auth})
+});
+
+
 // FOR FETCHING CHARTS WEEKLY DAYS BY MONTH
 app.post("/weeklychart", jsonParser,salesauth, async (req, res) => {
   // const {month} = req.body
@@ -72,7 +109,6 @@ app.post("/verifyauth", jsonParser, async (req, res) => {
   const { token } = req.body;
   const user =  jwt.verify(token,process.env.JWT_SECRET)
   if (user) {
-    console.log(user)
     res.status(200).json({token:token,type:user.type})
   }else{
     res.status(400)
@@ -88,7 +124,6 @@ app.post("/getauth", jsonParser, async (req, res) => {
   if (auth) {
     if (auth.password===password) {
       const token =  jwt.sign({ID:auth.ID,type:auth.type},process.env.JWT_SECRET)
-      console.log(token)
       res.status(200).json({token:token,type:auth.type,success:true})
       return
     }else{
@@ -101,7 +136,7 @@ app.post("/getauth", jsonParser, async (req, res) => {
 });
 
 // ADDING AUTHENTICATE USER
-app.post("/addauth", jsonParser, async (req, res) => {
+app.post("/addauth", jsonParser,auth, async (req, res) => {
   const {type,password,ID} = req.body
   const u = await Auth({
     type:type,
@@ -187,7 +222,18 @@ app.post("/addcompany", jsonParser,auth, async (req, res) => {
     // const del = await Company.findByIdAndRemove(existingCompany._id)
     res.status(200).json({ success: true });
     return;
-  } 
+  } else if (!existingCompany){
+    const newCompany =  Company({
+      billingAddress: billingAddress,
+  companyEmail: companyEmail,
+  companyMobile: companyMobile,
+  companyName: companyName,
+  id: id,
+  image: image,
+    })
+    await newCompany.save()
+    res.status(200).json({success:true})
+}
  
   // }
   // res.status(200).json({data:"ok"})

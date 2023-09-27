@@ -2,7 +2,6 @@ const Auth = require("../models/Auth");
 const jwt = require("jsonwebtoken")
 const auth = async (req, res, next) => {
     const { token } = req.body;
-    console.log(token)
     try {
 
   const user =  jwt.verify(token,process.env.JWT_SECRET)
