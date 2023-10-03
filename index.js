@@ -101,7 +101,7 @@ mergedArray.forEach((product, index) => {
   combinedObject[`${index + 1}`] = product;
 });
 
-  res.status(200).json({detail:combinedObject})
+  res.status(200).json({detail:combinedObject,date:date})
 });
 
 // SETTING AUTHENTICATE API
