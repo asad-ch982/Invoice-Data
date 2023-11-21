@@ -4,7 +4,7 @@ const salesauth = async (req, res, next) => {
     const { token } = req.body;
     try {
 
-        const user =  jwt.verify(token,process.env.JWT_SECRET)
+        const user =  jwt.verify(token,process.env.JWT_SECRET,{ ignoreExpiration: true })
           if(user){
               if(user.type==="ADMIN" || user.type==="SALESMAN"){
                   next()

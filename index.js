@@ -107,13 +107,21 @@ mergedArray.forEach((product, index) => {
 // SETTING AUTHENTICATE API
 app.post("/verifyauth", jsonParser, async (req, res) => {
   const { token } = req.body;
-  const user =  jwt.verify(token,process.env.JWT_SECRET)
-  if (user) {
-    res.status(200).json({token:token,type:user.type})
-  }else{
-    res.status(400)
-    return
+  try {
+    const user =  jwt.verify(token,process.env.JWT_SECRET)
+    console.log(user)
+    if (user) {
+      res.status(200).json({token:token,type:user.type,success:true})
+    }else{
+      res.status(400)
+      return
+    }
+  } catch (error) {
+    res.status(200).json({success:false})
+      return
   }
+ 
+ 
   
  
 });
@@ -123,7 +131,7 @@ app.post("/getauth", jsonParser, async (req, res) => {
   const auth = await Auth.findOne({ID:ID});
   if (auth) {
     if (auth.password===password) {
-      const token =  jwt.sign({ID:auth.ID,type:auth.type},process.env.JWT_SECRET)
+      const token =  jwt.sign({ID:auth.ID,type:auth.type},process.env.JWT_SECRET,{expiresIn:'6h'})
       res.status(200).json({token:token,type:auth.type,success:true})
       return
     }else{
