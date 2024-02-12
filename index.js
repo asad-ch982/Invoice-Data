@@ -32,6 +32,44 @@ app.post("/", jsonParser, async (req, res) => {});
 
 
 
+app.post("/historysale", jsonParser,auth, async (req, res) => {
+
+// const hash = "uWDZoyXoTHSK--g6Jurwr"
+// const date = "11/02/2024"
+  const {date,hash} = req.body
+
+const invoiceDetail = await InvoiceDetail.find({date:date})
+// let productExistsInAnyAsad = invoiceDetail.filter(asadObject =>
+//   asadObject.data.products.some(product => product.slug === hash)
+// );
+// if (productExistsInAnyAsad) {
+//   console.log(`Product with slug '${hash}' exists in at least one 'asad' object.`);
+//   res.status(200).json({productExistsInAnyAsad,len:productExistsInAnyAsad.length})
+// } else {
+//   console.log(`Product with slug '${hash}' does not exist in any 'asad' object.`);
+//   res.status(400).json({productExistsInAnyAsad})
+// }
+
+let idProductPairs = {};
+
+// Iterate through the asad objects and their products
+invoiceDetail.forEach(asadObject => {
+  asadObject.data.products.forEach(product => {
+    // Check if the product's slug matches the target slug
+    if (product.slug === hash) {
+      // Assign the product object to the id key in the new object
+      idProductPairs[asadObject.id] = product;
+    }
+  });
+});
+res.status(200).json({idProductPairs,len:idProductPairs.length})
+});
+
+
+
+
+
+
 
 
 
